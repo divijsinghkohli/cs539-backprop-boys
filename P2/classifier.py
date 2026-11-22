@@ -67,9 +67,9 @@ def set_trainable(model, phase):
 def train_transforms():
     #Augment the data (Rotation, Flipping, Blurring, Lighting Changes)
     return transforms.Compose([
-        #1. Any orientation: bricks lie at any angle. Corners exposed by rotating are filled white, like the dataset background
+        #1. Change Orientations
         transforms.RandomRotation(degrees=180, fill=(255, 255, 255)),
-        #2. Loose or off-center framing, like the detector's boxes; output is 224x224
+        #2. Change Framing (Off center)
         transforms.RandomResizedCrop(IMAGE_SIZE, scale=(0.7, 1.0), ratio=(0.8, 1.25)),
         #3. Mirror images
         transforms.RandomHorizontalFlip(),
@@ -77,7 +77,7 @@ def train_transforms():
         #4. Lighting changes and random hue
         transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.5, hue=0.5),
         transforms.RandomGrayscale(p=0.2),
-        #5. Occasional blur, like a phone photo
+        #5. Image blur, like a phone photo
         transforms.RandomApply([transforms.GaussianBlur(kernel_size=5, sigma=(0.1, 1.5))], p=0.3),
         #6. Convet image to tensor
         transforms.ToTensor(),
@@ -97,7 +97,7 @@ def eval_transforms():
 
 
 def load_model(weights_path, device="cpu"):
-    #1. Read the saved file: either the weights alone, or a training checkpoint that contains them under "model_state"
+    #1. Read the saved file: either the weights alone or a version during training
     saved = torch.load(weights_path, map_location=device, weights_only=True)
     state = saved["model_state"] if "model_state" in saved else saved
     #2. Build an empty model with the same number of classes as the saved one
@@ -105,7 +105,7 @@ def load_model(weights_path, device="cpu"):
     model = build_model(num_classes=num_classes, pretrained=False)
     #3. Copy the saved weights in, move to the device, and switch to evaluation mode
     model.load_state_dict(state)
-    model.to(device)
+    model.to(device) #default on cpu
     model.eval()
     return model
 
