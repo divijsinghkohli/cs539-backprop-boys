@@ -31,9 +31,10 @@ Only the real photos are used. The renders show one brick on a plain background,
 ```
 P1/
 ├── detector.py                    label conversion, scene grouping and split, detect(), evaluation helpers
-└── notebooks/
-    ├── 01_build_dataset.ipynb     download, convert, split, save lego_det.zip to Drive
-    └── 02_train.ipynb             train, pick threshold on dev, final test evaluation
+├── notebooks/
+│   ├── 01_build_dataset.ipynb     download, convert, split, save lego_det.zip to Drive
+│   └── 02_train.ipynb             train, pick threshold on dev, final test evaluation
+└── results/                       metrics, curves and example predictions from each run
 ```
 
 ## How to run (Colab, GPU runtime)
@@ -56,8 +57,26 @@ boxes = detector.detect(model, "photo.jpg", conf=0.5)   # use the threshold from
 
 ## Results
 
-To be filled in after the full training run.
+Test set: 439 held-out photos with 1,037 bricks, never used for training or for choosing settings.
+The confidence threshold (0.40) was picked on the dev set as the one with the best F1.
 
-| Run | Test mAP@0.5 | Test recall | Precision | Count accuracy | Threshold |
-|---|---|---|---|---|---|
-| yolov8n_1280 | | | | | |
+| Run | Test mAP@0.5 | mAP@0.5:0.95 | Recall | Precision | Count accuracy | Threshold |
+|---|---|---|---|---|---|---|
+| yolov8n_1280 | **0.969** | 0.915 | **0.949** | 0.934 | 0.841 | 0.40 |
+
+| Test photos | Recall | Precision | Count accuracy |
+|---|---|---|---|
+| 1 brick (318 photos) | 0.953 | 0.910 | 0.896 |
+| 2+ bricks (121 photos) | 0.947 | 0.945 | 0.694 |
+
+Count accuracy is the share of photos where the number of boxes exactly matches the number of bricks.
+
+**Training.** 30 epochs, 55 minutes on a Colab T4. Dev mAP@0.5 was 0.78 after the first epoch and was still rising slightly at epoch 30, so it never triggered early stopping.
+
+**Where it fails** (`results/yolov8n_1280/test_examples.png`):
+- **Round non-LEGO objects** (magnets, buttons) next to bricks get detected as bricks, which over-counts busy scenes.
+- **Piles of touching bricks** are under-counted. One photo of a heap of 14 bricks gets 2 boxes. This is the overlap risk from the proposal.
+- Single bricks are rarely missed; most single-brick errors are an extra box on a nearby object.
+
+Files: `results/yolov8n_1280/` (test metrics, dev threshold table, training log and curves, example predictions) and `results/dataset/` (split list and counts, label check image).
+Weights: `MyDrive/ece539-p1/checkpoints/yolov8n_1280/weights/best.pt`.

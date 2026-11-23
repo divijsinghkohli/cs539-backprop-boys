@@ -1,0 +1,5 @@
+n_bricks,train,dev,test,All
+1 brick,1721,353,318,2392
+2-5 bricks,301,68,85,454
+6+ bricks,31,20,36,87
+All,2053,441,439,2933

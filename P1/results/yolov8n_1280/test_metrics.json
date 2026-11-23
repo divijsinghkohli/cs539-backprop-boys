@@ -1,0 +1,26 @@
+{
+  "run": "yolov8n_1280",
+  "model": "yolov8n.pt",
+  "imgsz": 1280,
+  "epochs_trained": 30,
+  "conf_threshold": 0.4,
+  "iou_threshold": 0.5,
+  "test_photos": 439,
+  "test_bricks": 1037,
+  "mAP50": 0.9686167166416854,
+  "mAP50_95": 0.9150067068073289,
+  "precision": 0.9335863377609108,
+  "recall": 0.9488910318225651,
+  "f1": 0.9411764705882352,
+  "count_accuracy": 0.8405466970387244,
+  "single_brick_photos": {
+    "recall": 0.9528301886792453,
+    "precision": 0.9099099099099099,
+    "count_accuracy": 0.8962264150943396
+  },
+  "multi_brick_photos": {
+    "recall": 0.9471488178025035,
+    "precision": 0.9445214979195562,
+    "count_accuracy": 0.6942148760330579
+  }
+}
